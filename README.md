@@ -18,7 +18,7 @@ chooses dishes and writes recipes; it never supplies a nutrient figure.
 
 <img src="docs/images/home.jpg" width="100%" alt="The home page: the day drawn as a clock with meals on its rim, rings for energy, protein, carbs and fat, and the week along the bottom" />
 
-**[Try it live](https://abhinav-prabhakar.github.io/Pantry/)** · [how it is built](PLAN.md) · [design notes](DESIGN.md)
+**[Try it live](https://abhinav-prabhakar.github.io/Pantry/)**
 
 </div>
 
@@ -151,38 +151,6 @@ microphone for when your hands are covered in dough.
   model is reached through a small Cloudflare Worker that holds the keys (deployed by a GitHub Action from
   repository secrets), or with a key you paste into your profile.
 
-## Quickstart
-
-```bash
-git clone https://github.com/Abhinav-Prabhakar/pantry && cd pantry
-cp .env.example .env        # put your key in VOIDAI_API_KEY (any OpenAI-compatible service works)
-node server.mjs             # Node 20+, nothing to install  →  http://localhost:4173
-```
-
-No key? Load the example week from the first screen and everything except planning, chat and written recipes works,
-including typed shelf entry and full nutrient tracking.
-
-```bash
-node --test                 # 43 tests, no network, no cost
-node scripts/shots.mjs      # drives headless Chrome through the app and retakes the screenshots above
-```
-
-### Settings
-
-| `.env` | |
-|---|---|
-| `VOIDAI_API_KEY`, `VOIDAI_BASE_URL` | The OpenAI-compatible service for text. |
-| `PANTRY_TEXT_MODEL` | Default `gpt-4o-mini`. |
-| `PANTRY_VISION_MODEL` | Reads photos of your shelf. Defaults to the text model; an `@cf/...` model runs on Cloudflare. |
-| `FDC_API_KEY` | Optional. USDA FoodData Central branded foods, as a second online lookup after Open Food Facts. |
-| `PANTRY_IMAGE_MODEL` | Dish pictures from the same service. Empty means emoji. |
-| `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN` | Dish pictures from Cloudflare Workers AI instead (free daily allowance). |
-
-The [live demo](https://abhinav-prabhakar.github.io/Pantry/) has no server of its own. It talks to a small
-Cloudflare Worker that holds the keys and runs the same code, with text, pictures, speech and transcription all on
-Cloudflare Workers AI's free daily allowance. If that allowance runs out for the day, AI features pause until
-midnight UTC.
-
 ## Using it
 
 1. **Tell it about you.** Top-right pill: rulers for weight, height and age; activity; goal; what you leave out;
@@ -194,36 +162,6 @@ midnight UTC.
 5. **Cook once.** Scrub the ribbon to see the afternoon, press play, and follow each dish step by step.
 6. **Eat and track.** Tap plates as you eat them, tap the plus for anything else, tap water drops.
 7. **Talk to it** whenever something should change.
-
-## Honest notes
-
-- **Nutrient figures are estimates for planning, not medical advice.** They come from USDA FoodData Central (SR
-  Legacy) and are only as good as the match between "a handful of spinach" and a row in a table.
-- **Oat milk is stood in for** by unsweetened rice milk (the table has no oat milk); a label or lookup replaces it.
-  25 foods added from USDA SR28 have estimated amino acids and some estimated omega-3/6 (`scripts/add-sr28.py`).
-- **Photo reading needs a vision model.** The hosted demo reads photos with Llama 4 Scout on Workers AI; locally,
-  set `PANTRY_VISION_MODEL` to a model that sees (an `@cf/` model works with the Cloudflare settings).
-- **Online lookups** (Open Food Facts) need the server, Worker or browser to reach openfoodfacts.org.
-- **Not yet tested on a real iPad or with a real microphone.** The voice tools were exercised by feeding them text,
-  and transcription with a synthesised recording.
-- **Your data lives in your browser.** There are no accounts; clearing site data starts you again from empty.
-- **Timers alert while the app is open** in a tab, even in the background. With the tab closed or the screen locked
-  they keep time and catch up when you return, but cannot ring.
-- **Not built yet:** packing and storing portions, and an inventory that subtracts what you cooked.
-
-## Where things are
-
-| | |
-|---|---|
-| `index.html` · `home.css` · `home.js` | The home page. |
-| `cook.html` · `styles.css` · `app.js` · `cook-data.js` | Cook mode. |
-| `server.mjs` | Serves the app and `/api/*`, and keeps the key off the page. |
-| `worker/worker.js` · `scripts/deploy-worker.mjs` · `.github/workflows/api.yml` | The same API as a Cloudflare Worker for the static site, and how it is deployed. |
-| `voice.js` | Hearing (browser recogniser, or record and transcribe) and speaking. |
-| `lib/nutrition.js` · `lib/schedule.js` · `lib/foods.js` · `lib/api.js` | Targets and scores, the scheduler, food matching, everything that talks to the model. Shared by server and browser. |
-| `data/` | The nutrient list, the USDA table, the emoji list. |
-| `test/` | Unit tests against a stand-in model. |
-| `PLAN.md` · `DESIGN.md` · `CONTEXT.md` | How it works, how it should look, how to work on it. |
 
 ## Credits
 
